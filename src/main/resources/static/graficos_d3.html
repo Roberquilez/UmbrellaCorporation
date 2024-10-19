@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Dispersión</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Estilos básicos para el gráfico */
+        .point {
+            fill: steelblue;
+            stroke: white;
+            stroke-width: 1.5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Gráfico de Dispersión</h1>
+<svg width="800" height="600"></svg>
+
+<script>
+    // URL de tus datos
+    const dataUrl = 'http://localhost:8080/datos-csv?filePath=src/res/gifted_iq_data.csv';
+
+    // Función para cargar los datos y generar el gráfico
+    d3.json(dataUrl).then(function(data) {
+        // Transformar los datos en formato adecuado
+        const points = data.map(d => ({
+            x: +d[0], // Asegúrate de usar el índice correcto para las columnas que deseas
+            y: +d[1]
+        }));
+
+        // Configurar los márgenes y dimensiones
+        const margin = {top: 20, right: 30, bottom: 40, left: 40},
+            width = 800 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+
+        const svg = d3.select("svg")
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // Configurar los ejes
+        const x = d3.scaleLinear()
+            .domain(d3.extent(points, d => d.x)).nice()
+            .range([0, width]);
+
+        const y = d3.scaleLinear()
+            .domain(d3.extent(points, d => d.y)).nice()
+            .range([height, 0]);
+
+        svg.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0, ${height})`)
+            .call(d3.axisBottom(x));
+
+        svg.append("g")
+            .attr("class", "y-axis")
+            .call(d3.axisLeft(y));
+
+        // Añadir los puntos al gráfico
+        svg.selectAll(".point")
+            .data(points)
+            .enter().append("circle")
+            .attr("class", "point")
+            .attr("cx", d => x(d.x))
+            .attr("cy", d => y(d.y))
+            .attr("r", 5);
+    });
+</script>
+</body>
+</html>

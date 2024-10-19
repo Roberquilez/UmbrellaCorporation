@@ -20,6 +20,7 @@ public class LectorDatosCSV {
         List<Future<List<String[]>>> futures = new ArrayList<>();
 
         // Leer el archivo CSV
+        System.out.println("Leyendo archivo CSV: " + filePath);  // Impresión de depuración
         List<String> allLines;
         try {
             allLines = Files.readAllLines(Paths.get(filePath));
