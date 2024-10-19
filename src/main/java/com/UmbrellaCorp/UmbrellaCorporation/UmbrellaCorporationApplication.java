@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class UmbrellaCorporationApplication {
 
 	public static void main(String[] args) {
+		MonitoringTool.printThreadInfo();
+		DataProcessor processor = new DataProcessor();
+		processor.processData();
 		SpringApplication.run(UmbrellaCorporationApplication.class, args);
 	}
-
 }
