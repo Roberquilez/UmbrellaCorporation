@@ -17,7 +17,7 @@ public class CSVController {
 
     @GetMapping("/datos-csv")
     public List<String[]> procesarCSV(@RequestParam(required = false) String filePath) {
-        String path = (filePath != null) ? filePath : "src/res/gifted_iq_data.csv"; // Usa la ruta por defecto si no se proporciona
+        String path = (filePath != null) ? filePath : "/src/res/gifted_iq_data.csv"; // Usa la ruta por defecto si no se proporciona
         try {
             return lectorDatosCSV.leerCSVConcurrencia(path);
         } catch (Exception e) {

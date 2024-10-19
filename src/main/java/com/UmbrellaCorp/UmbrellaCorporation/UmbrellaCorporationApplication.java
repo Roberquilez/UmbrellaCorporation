@@ -20,13 +20,13 @@ public class UmbrellaCorporationApplication {
 		try {
 			if (os.contains("win")) {
 				// Windows
-				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://localhost:8080/datos-csv?filePath=src/res/gifted_iq_data.csv");
+				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://localhost:8080/graficos_d3.html");
 			} else if (os.contains("mac")) {
 				// Mac
-				Runtime.getRuntime().exec("open http://localhost:8080/datos-csv?filePath=src/res/gifted_iq_data.csv");
+				Runtime.getRuntime().exec("open http://localhost:8080/graficos_d3.html");
 			} else if (os.contains("nix") || os.contains("nux")) {
 				// Linux
-				Runtime.getRuntime().exec("xdg-open http://localhost:8080/datos-csv?filePath=src/res/gifted_iq_data.csv");
+				Runtime.getRuntime().exec("xdg-open http://localhost:8080/graficos_d3.html");
 			} else {
 				System.err.println("Sistema operativo no soportado para abrir el navegador.");
 			}
