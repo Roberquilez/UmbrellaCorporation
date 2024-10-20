@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos de D3.js</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Estilos básicos para los gráficos */
+        .dot {
+            fill: steelblue;
+        }
+
+        .bar {
+            fill: orange; /* Cambia el color de las barras si lo deseas */
+        }
+
+        .axis text {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<h1>Gráficos de D3.js</h1>
+<h2>Score vs Father IQ</h2>
+<svg id="fatherIQChart" width="800" height="400"></svg>
+
+<h2>Score vs Mother IQ</h2>
+<svg id="motherIQChart" width="800" height="400"></svg>
+
+<h2>Speak vs Read</h2>
+<svg id="readSpeakChart" width="800" height="400"></svg>
+
+<script>
+    // URL de tus datos
+    const dataUrl = 'http://localhost:8080/datos-csv?filePath=src/res/gifted_iq_data.csv';
+
+    // Función para cargar los datos y generar los gráficos
+    d3.json(dataUrl).then(function(data) {
+        // Transformar los datos en formato adecuado
+        const points = data.map(d => ({
+            score: +d[0],
+            fatheriq: +d[1],
+            motheriq: +d[2],
+            read: +d[3],
+            speak: +d[4]
+        }));
+
+        // Crear el gráfico de dispersión para Score vs Father IQ
+        createScatterPlot(points, "fatherIQChart", "fatheriq", "score", "Father IQ", "Score");
+
+        // Crear el gráfico de dispersión para Score vs Mother IQ
+        createScatterPlot(points, "motherIQChart", "motheriq", "score", "Mother IQ", "Score");
+
+        // Crear el gráfico de barras para Speak vs Read
+        createBarChartForSpeakRead(points, "readSpeakChart", "speak", "read", "Speak", "Read");
+    });
+
+    // Función para crear gráficos de dispersión
+    function createScatterPlot(data, elementId, xKey, yKey, xLabel, yLabel) {
+        const margin = {top: 20, right: 30, bottom: 40, left: 40},
+            width = 800 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+        const svg = d3.select(`#${elementId}`)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // Configurar los ejes
+        const xMin = d3.min(data, d => d[xKey]);
+        const xMax = d3.max(data, d => d[xKey]);
+        const yMin = d3.min(data, d => d[yKey]);
+        const yMax = d3.max(data, d => d[yKey]);
+
+        const x = d3.scaleLinear()
+            .domain([xMin, xMax]).nice()
+            .range([0, width]);
+
+        const y = d3.scaleLinear()
+            .domain([yMin, yMax]).nice()
+            .range([height, 0]);
+
+        // Ejes
+        svg.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0, ${height})`)
+            .call(d3.axisBottom(x))
+            .append("text")
+            .attr("fill", "black")
+            .attr("x", width / 2)
+            .attr("y", margin.bottom - 10)
+            .attr("text-anchor", "middle")
+            .text(xLabel);
+
+        svg.append("g")
+            .attr("class", "y-axis")
+            .call(d3.axisLeft(y))
+            .append("text")
+            .attr("fill", "black")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -margin.left + 10)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text(yLabel);
+
+        // Añadir puntos al gráfico
+        svg.selectAll(".dot")
+            .data(data)
+            .enter().append("circle")
+            .attr("class", "dot")
+            .attr("cx", d => x(d[xKey]))
+            .attr("cy", d => y(d[yKey]))
+            .attr("r", 5); // Ajusta el tamaño del punto
+    }
+
+    // Función para crear gráfico de barras para Speak vs Read
+    function createBarChartForSpeakRead(data, elementId, xKey, yKey, xLabel, yLabel) {
+        const margin = {top: 20, right: 30, bottom: 40, left: 40},
+            width = 800 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+        const svg = d3.select(`#${elementId}`)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // Agrupar datos para el gráfico de Speak vs Read
+        const groupedData = d3.rollup(data, v => d3.mean(v, d => d[yKey]), d => d[xKey]);
+        const barData = Array.from(groupedData, ([key, value]) => ({key, value}));
+
+        // Configurar los ejes
+        const x = d3.scaleBand()
+            .domain(barData.map(d => d.key))
+            .range([0, width])
+            .padding(0.1);
+
+        const yMin = d3.min(barData, d => d.value);
+        const yMax = d3.max(barData, d => d.value);
+
+        const y = d3.scaleLinear()
+            .domain([yMin, yMax]).nice()
+            .range([height, 0]);
+
+        // Ejes
+        svg.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0, ${height})`)
+            .call(d3.axisBottom(x))
+            .append("text")
+            .attr("fill", "black")
+            .attr("x", width / 2)
+            .attr("y", margin.bottom - 10)
+            .attr("text-anchor", "middle")
+            .text(xLabel);
+
+        svg.append("g")
+            .attr("class", "y-axis")
+            .call(d3.axisLeft(y).ticks(10))
+            .append("text")
+            .attr("fill", "black")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -margin.left + 10)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text(yLabel);
+
+        // Añadir las barras al gráfico
+        svg.selectAll(".bar")
+            .data(barData)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", d => x(d.key))
+            .attr("y", d => y(d.value))
+            .attr("width", x.bandwidth())
+            .attr("height", d => height - y(d.value));
+    }
+</script>
+</body>
+</html>
