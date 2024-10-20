@@ -1,6 +1,7 @@
 # UmbrellaCorporation
 
 link al repositorio: https://github.com/Roberquilez/UmbrellaCorporation.git
+Propietarios: Adrián Puyo Olías, Sira Gonzalez-Madroño y Roberto
 
 ## 1. Descripción del Proyecto
 
