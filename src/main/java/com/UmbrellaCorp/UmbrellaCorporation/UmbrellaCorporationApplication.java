@@ -38,4 +38,5 @@ public class UmbrellaCorporationApplication {
 			e.printStackTrace();
 		}
 	}
+}
 
